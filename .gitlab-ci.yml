@@ -30,6 +30,6 @@ build-rootless:
         --progress=plain \
         --frontend dockerfile.v0 \
         --local context=. \
-        --local dockerfile=. \
+        --local dockerfile=Dockerfile \
         --output type=image,name=$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA,push=true
 
