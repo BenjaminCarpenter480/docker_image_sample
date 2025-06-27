@@ -11,6 +11,7 @@ build-image:
     BUILDKITD_FLAGS: "--debug"
     CI_DEBUG_TRACE: "true"
   before_script:
+    - ls /
     - echo 'Doing the pre script'
   script:
     - |
