@@ -9,6 +9,8 @@ build-image:
   stage: build
   variables:
     BUILDKITD_FLAGS: "--debug"
+  before_script:
+    echo 'Doing the pre script'
   script:
     - |
       buildctl-daemonless.sh build \
