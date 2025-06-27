@@ -1,25 +1,18 @@
 stages:
   - build
 
-variables:
-  BUILDKIT_PROGRESS: plain
-
-build-image:
+build-rootless:
   image: moby/buildkit:rootless
   stage: build
   variables:
-    BUILDKITD_FLAGS: "--debug"
-    CI_DEBUG_TRACE: "true"
+    BUILDKITD_FLAGS: --oci-worker-no-process-sandbox
   before_script:
-    - ls /
-    - echo 'Doing the pre script'
+    - mkdir -p ~/.docker
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > ~/.docker/config.json
   script:
     - |
       buildctl-daemonless.sh build \
         --frontend dockerfile.v0 \
         --local context=. \
         --local dockerfile=. \
-        --output type=image,name=registry.gitlab.com/$CI_PROJECT_PATH:latest,push=true
-  only:
-    - main
-
+        --output type=image,name=$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA,push=true
