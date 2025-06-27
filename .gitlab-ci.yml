@@ -13,6 +13,7 @@ build-rootless:
     - |
       buildctl-daemonless.sh build \
         --frontend dockerfile.v0 \
+        --privileged
         --local context=. \
         --local dockerfile=. \
         --output type=image,name=$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA,push=true
