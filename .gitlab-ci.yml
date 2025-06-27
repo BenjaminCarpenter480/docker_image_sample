@@ -9,6 +9,7 @@ build-image:
   stage: build
   variables:
     BUILDKITD_FLAGS: "--debug"
+    CI_DEBUG_TRACE: "true"
   before_script:
     echo 'Doing the pre script'
   script:
