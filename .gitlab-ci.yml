@@ -7,6 +7,9 @@ build-rootless:
     - mkdir -p ~/.docker
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > ~/.docker/config.json
   script:
+    - set -e
+    - set -x
+    - ls -l
     - |
       buildctl-daemonless.sh build \
         --frontend dockerfile.v0 \
