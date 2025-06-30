@@ -8,13 +8,11 @@ build-rootless:
     - mkdir -p ~/.docker
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > ~/.docker/config.json
   script:
-    # - set -e
-    # - set -x
     - |
-      buildctl-daemonless.sh build \
+      buildctl-daemonless.sh debug build --verbose \
         --frontend dockerfile.v0 \
         --local context=. \
-        --local dockerfile=.
+        --local dockerfile=./Dockerfile
       securityContext:
         privileged: true
 
