@@ -17,5 +17,4 @@ build-rootless:
         --output type=image,name=$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA,push=true
 
   tags:
-    - docker
     - privileged
