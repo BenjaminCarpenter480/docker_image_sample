@@ -1,5 +1,7 @@
 build-rootless:
-  image: moby/buildkit:rootless
+  image:
+    name: moby/buildkit:rootless
+    entrypoint: [ "sh", "-c" ]
   stage: build
   variables:
     BUILDKITD_FLAGS: --oci-worker-no-process-sandbox
