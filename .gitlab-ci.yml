@@ -1,6 +1,3 @@
-stages:
-  - build
-
 build-rootless:
   image: moby/buildkit:rootless
   stage: build
@@ -10,11 +7,9 @@ build-rootless:
     - mkdir -p ~/.docker
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > ~/.docker/config.json
   script:
-    - ls
-    - buildctl debug build --verbose \
+    - |
+      buildctl-daemonless.sh build \
         --frontend dockerfile.v0 \
-        --privileged
         --local context=. \
         --local dockerfile=. \
         --output type=image,name=$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA,push=true
-        --opt filename=./Dockerfile
