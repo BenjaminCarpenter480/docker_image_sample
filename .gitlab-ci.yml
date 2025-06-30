@@ -1,7 +1,6 @@
 build-rootless:
   image:
     name: moby/buildkit:rootless
-    # entrypoint: [ "sh", "-c" ]
   stage: build
   variables:
     BUILDKITD_FLAGS: --oci-worker-no-process-sandbox
@@ -9,12 +8,14 @@ build-rootless:
     - mkdir -p ~/.docker
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > ~/.docker/config.json
   script:
-    - set -e
-    - set -x
-    - ls -l
+    # - set -e
+    # - set -x
     - |
       buildctl-daemonless.sh build \
         --frontend dockerfile.v0 \
         --local context=. \
-        --local dockerfile=. \
-        --output type=image,name=$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA,push=true
+        --local dockerfile=.
+      securityContext:
+        privileged: true
+
+        # --output type=image,name=$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA,push=true
