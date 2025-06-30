@@ -1,6 +1,6 @@
 build-rootless:
   image:
-    name: moby/buildkit:rootless
+    name: moby/buildkit
   stage: build
   variables:
     BUILDKITD_FLAGS: --oci-worker-no-process-sandbox
@@ -14,7 +14,4 @@ build-rootless:
         --local context=. \
         --local dockerfile=./Dockerfile
         --security-opt apparmor:unconfined
-      securityContext:
-        privileged: true
-
-        # --output type=image,name=$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA,push=true
+        --output type=image,name=$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA,push=true
