@@ -19,4 +19,3 @@ build-rootless:
   tags:
     - docker
     - privileged
-  privileged: true
