@@ -6,7 +6,7 @@ build-rootless:
     BUILDKITD_FLAGS: --oci-worker-no-process-sandbox
   before_script:
     - mkdir -p ~/.docker
-    - echo "{\"auths\":{\"${HARBOR_HOST}\":{\"username\":\"${HARBOR_USERNAME}\",\"password\":\"${HARBOR_PASSWORD}\"}}}" > ~/.docker/config.json
+    - echo "{\"auths\":{\"${HARBOR_URL\":{\"username\":\"${HARBOR_USERNAME}\",\"password\":\"${HARBOR_PASSWORD}\"}}}" > ~/.docker/config.json
   script:
     - |
       buildctl-daemonless.sh build \
