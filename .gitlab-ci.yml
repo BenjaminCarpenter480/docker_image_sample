@@ -13,5 +13,4 @@ build-rootless:
         --frontend dockerfile.v0 \
         --local context=. \
         --local dockerfile=. \
-        --output type=image,name=$HARBOR_URL/$HARBOR_PROJECT/DockerImageBuildTest:$CI_COMMIT_SHA,push=true
-
+        --output type=image,name=$HARBOR_URL/$HARBOR_PROJECT/dockerimagebuildtest:$CI_COMMIT_SHA,push=true
