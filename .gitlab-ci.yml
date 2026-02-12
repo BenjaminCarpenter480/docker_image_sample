@@ -14,5 +14,4 @@ build-rootless:
         --local context=. \
         --local dockerfile=. \
         --output type=image,name=$CI_REGISTRY_IMAGE_EXT:$CI_COMMIT_SHA,push=true
-  tags:
-    - docker
+
