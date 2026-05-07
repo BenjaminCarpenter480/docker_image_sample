@@ -14,4 +14,4 @@ build-rootless:
         --frontend dockerfile.v0 \
         --local context=. \
         --local dockerfile=. \
-        --output type=image,name=$REG_IMAGE,push=true
+        --output type=image,\"name=$REG_IMAGE,name=$HARBOR_HOST/$HARBOR_PROJECT/hello-world:latest\",push=true
