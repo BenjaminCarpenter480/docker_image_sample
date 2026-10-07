@@ -15,4 +15,3 @@ build-rootless:
         --local context=. \
         --local dockerfile=. \
         --output type=image,name=$HARBOR_HOST/$HARBOR_PROJECT/hello-world:latest,push=true
-        # --output type=image,\"name=$IMAGE_URI,$HARBOR_HOST/$HARBOR_PROJECT/hello-world:latest\",push=true
