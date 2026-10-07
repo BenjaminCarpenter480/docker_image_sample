@@ -24,6 +24,11 @@ build-rootless:
         --local context=. \
         --local dockerfile=. \
         --output type=image,name=$HARBOR_HOST/$HARBOR_PROJECT/hello-world:latest,push=true
+        --metadata-file=$CI_PROJECT_DIR/buildkit-metadata.json
+  artifacts:
+    paths:
+      - buildkit-metadata.json
+    expire_in: 1 week
 
 sign-image:
   stage: sign
