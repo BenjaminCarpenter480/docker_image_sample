@@ -4,7 +4,7 @@ build-rootless:
   stage: build
   variables:
     BUILDKITD_FLAGS: --oci-worker-no-process-sandbox
-    REG_IMAGE: "$HARBOR_HOST/$HARBOR_PROJECT/hello-world:$CI_COMMIT_SHA"
+    IMAGE_URI: "$HARBOR_HOST/$HARBOR_PROJECT/hello-world:$CI_COMMIT_SHA"
   before_script:
     - mkdir -p ~/.docker
     - echo "{\"auths\":{\"$HARBOR_HOST\":{\"username\":\"$HARBOR_USERNAME\" ,\"password\":\"$HARBOR_PASSWORD\"}}}" > ~/.docker/config.json
@@ -15,4 +15,4 @@ build-rootless:
         --local context=. \
         --local dockerfile=. \
         --output type=image,name=$HARBOR_HOST/$HARBOR_PROJECT/hello-world:latest,push=true
-        # --output type=image,\"name=$REG_IMAGE,$HARBOR_HOST/$HARBOR_PROJECT/hello-world:latest\",push=true
+        # --output type=image,\"name=$IMAGE_URI,$HARBOR_HOST/$HARBOR_PROJECT/hello-world:latest\",push=true
