@@ -13,7 +13,6 @@ build-rootless:
   variables:
     BUILDKITD_FLAGS: --oci-worker-no-process-sandbox
   before_script:
-    - apk add --no-cache jq # Install jq for parsing JSON in the build metadata
     # Login to Harbor registry using provided credentials to allow pushing the built image
     # TODO: Turn this into a anchor possibly
     - mkdir -p ~/.docker
@@ -27,7 +26,7 @@ build-rootless:
         --output type=image,name=$HARBOR_HOST/$HARBOR_PROJECT/hello-world:latest,push=true \
         --metadata-file=$CI_PROJECT_DIR/buildkit-metadata.json
 
-    - IMAGE_DIGEST=$(cat $CI_PROJECT_DIR/buildkit-metadata.json | jq '."containerimage.digest"'| tr -d '"') # Retrieve the digest of the pushed image from the build metadata
+    - IMAGE_DIGEST=$(tr -d '\n' <md.json | grep -o '"containerimage.digest":[^"]*"[^"]*"' | sed -E 's/".*".*"(.*)"/\1/') # Extract the digest value from the JSON metadata
     - echo "IMAGE_DIGEST=$IMAGE_DIGEST" >> $CI_PROJECT_DIR/build.env
   artifacts:
     paths:
