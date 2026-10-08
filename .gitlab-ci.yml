@@ -73,4 +73,4 @@ sign-image:
     - |
       cosign verify --key $COSIGN_PUBLIC_KEY\
         --annotations "tag=$IMAGE_TAG" \
-        "$IMAGE_URI"
+        "$IMAGE_DIGEST"
