@@ -56,7 +56,7 @@ sign-image:
     # Sign the image using Cosign with annotations that provide metadata about the build and tag annotation to allow verifying
     # the tag->digest mapping (https://github.com/sigstore/cosign?tab=readme-ov-file#tag-signing)
     - |
-      cosign sign "$IMAGE_DIGEST" \
+      cosign -d sign "$IMAGE_DIGEST" \
         --annotations "com.gitlab.ci.user.name=$GITLAB_USER_NAME" \
         --annotations "com.gitlab.ci.pipeline.id=$CI_PIPELINE_ID" \
         --annotations "com.gitlab.ci.pipeline.url=$CI_PIPELINE_URL" \
