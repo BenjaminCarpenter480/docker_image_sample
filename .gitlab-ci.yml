@@ -35,7 +35,7 @@ sign-image:
   dependencies:
     - build-rootless
   image:
-    name: docker:latest
+    name: bitnami/cosign:latest
 
   variables:
     COSIGN_YES: "true" # Automatically confirm actions in Cosign without user interaction
