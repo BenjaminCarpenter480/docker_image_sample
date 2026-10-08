@@ -4,7 +4,8 @@ stages:
 
 variables:
   IMAGE_TAG: $CI_COMMIT_SHA
-  IMAGE_URI: "$HARBOR_HOST/$HARBOR_PROJECT/hello-world:$IMAGE_TAG"
+  IMAGE_NAME: $HARBOR_HOST/$HARBOR_PROJECT/hello-world
+  IMAGE_URI: "$IMAGE_NAME:$IMAGE_TAG"
 
 build-rootless:
   image:
@@ -46,7 +47,7 @@ sign-image:
       aud: sigstore # Provide an OIDC token for keyless signing with Cosign
 
   before_script:
-    - IMAGE_DIGEST=$(tr -d '\n' <$CI_PROJECT_DIR/buildkit-metadata.json | grep -o '"containerimage.digest":[^"]*"[^"]*"' | sed -E 's/".*".*"(.*)"/\1/') # Extract the digest value from the JSON metadata
+    - IMAGE_DIGEST=$IMAGE_NAME@$(tr -d '\n' <$CI_PROJECT_DIR/buildkit-metadata.json | grep -o '"containerimage.digest":[^"]*"[^"]*"' | sed -E 's/".*".*"(.*)"/\1/') # Extract the digest value from the JSON metadata
     # Login to Harbor registry using provided credentials to allow pushing the built image
     - mkdir -p ~/.docker
     - echo "{\"auths\":{\"$HARBOR_HOST\":{\"username\":\"$HARBOR_USERNAME\" ,\"password\":\"$HARBOR_PASSWORD\"}}}" > ~/.docker/config.json
