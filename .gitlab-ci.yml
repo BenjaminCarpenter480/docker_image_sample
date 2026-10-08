@@ -71,8 +71,6 @@ sign-image:
 
     # Verify the image signature using Cosign to ensure it matches the expected annotations and certificate identity
     - |
-      cosign verify \
+      cosign verify --key $COSIGN_PUBLIC_KEY\
         --annotations "tag=$IMAGE_TAG" \
-        --certificate-identity "$CI_PROJECT_URL//.gitlab-ci.yml@refs/heads/$CI_COMMIT_REF_NAME" \
-        --certificate-oidc-issuer "$CI_SERVER_URL" \
         "$IMAGE_URI"
