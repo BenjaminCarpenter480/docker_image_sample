@@ -27,7 +27,7 @@ build-rootless:
         --metadata-file=$CI_PROJECT_DIR/buildkit-metadata.json
 
     - IMAGE_DIGEST=$(cat $CI_PROJECT_DIR/buildkit-metadata.json | jq '."containerimage.digest"'| tr -d '"') # Retrieve the digest of the pushed image from the build metadata
-    - echo "IMAGE_DIGEST=$IMAGE_DIGEST" >> build.env
+    - echo "IMAGE_DIGEST=$IMAGE_DIGEST" >> $CI_PROJECT_DIR/build.env
   artifacts:
     paths:
       - buildkit-metadata.json
@@ -50,7 +50,7 @@ sign-image:
       aud: sigstore # Provide an OIDC token for keyless signing with Cosign
 
   before_script:
-    - source build.env # Load the image digest from the build stage's environment file.NOTE: Not actually required gitlab does automatically
+    - source $CI_PROJECT_DIR/build.env # Load the image digest from the build stage's environment file.NOTE: Not actually required gitlab does automatically
     # Login to Harbor registry using provided credentials to allow pushing the built image
     - mkdir -p ~/.docker
     - echo "{\"auths\":{\"$HARBOR_HOST\":{\"username\":\"$HARBOR_USERNAME\" ,\"password\":\"$HARBOR_PASSWORD\"}}}" > ~/.docker/config.json
