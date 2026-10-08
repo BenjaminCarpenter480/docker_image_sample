@@ -52,7 +52,7 @@ sign-image:
     - echo "{\"auths\":{\"$HARBOR_HOST\":{\"username\":\"$HARBOR_USERNAME\" ,\"password\":\"$HARBOR_PASSWORD\"}}}" > ~/.docker/config.json
 
   script:
-    - IMAGE_DIGEST=$(cat $CI_PROJECT_DIR/buildkit-metadata.json | jq '."containerimage.digest"') # Retrieve the digest of the pushed image from the build metadata
+    - IMAGE_DIGEST=$(cat $CI_PROJECT_DIR/buildkit-metadata.json | jq '."containerimage.digest"'| tr -d '"') # Retrieve the digest of the pushed image from the build metadata
 
     # Sign the image using Cosign with annotations that provide metadata about the build and tag annotation to allow verifying
     # the tag->digest mapping (https://github.com/sigstore/cosign?tab=readme-ov-file#tag-signing)
