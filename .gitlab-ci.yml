@@ -45,7 +45,7 @@ sign-image:
       aud: sigstore # Provide an OIDC token for keyless signing with Cosign
 
   before_script:
-    - yum install -y  jq # Install Cosign (mandatory) and jq (optional)
+    - sudo yum install -y  jq # Install Cosign (mandatory) and jq (optional)
     # Login to Harbor registry using provided credentials to allow pushing the built image
     - mkdir -p ~/.docker
     - echo "{\"auths\":{\"$HARBOR_HOST\":{\"username\":\"$HARBOR_USERNAME\" ,\"password\":\"$HARBOR_PASSWORD\"}}}" > ~/.docker/config.json
