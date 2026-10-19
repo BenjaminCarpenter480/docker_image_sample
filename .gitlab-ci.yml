@@ -30,6 +30,7 @@ sign-image-notation:
   variables:
     DOCKER_HOST: tcp://docker:2375
     NOTATION_VERSION: 1.3.2
+    DOCKER_AUTH_CONFIG: '{"auths":{"$HARBOR_HOST":{"username":"$HARBOR_USERNAME","password":"$HARBOR_PASSWORD"}}}'
   before_script:
     - mkdir -p ~/.docker
     - echo "{\"auths\":{\"$HARBOR_HOST\":{\"username\":\"$HARBOR_USERNAME\" ,\"password\":\"$HARBOR_PASSWORD\"}}}" > ~/.docker/config.json
