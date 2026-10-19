@@ -47,7 +47,7 @@ sign-image-notation:
     # Login to the registry using notation
     - curl -LO https://github.com/notaryproject/notation/releases/download/v$NOTATION_VERSION/notation_$NOTATION_VERSION\_linux_amd64.tar.gz
     - curl -LO https://github.com/notaryproject/notation/releases/download/v$NOTATION_VERSION/notation_$NOTATION_VERSION\_checksums.txt
-    - tar xvzf  notation_$NOTATION_VERSION\_linux_amd64.tar.gz -C /usr/bin/ notation0
+    - tar xvzf  notation_$NOTATION_VERSION\_linux_amd64.tar.gz -C /usr/bin/ notation
     - notation login -u $HARBOR_USERNAME -p $HARBOR_PASSWORD $HARBOR_HOST
 
   script:
