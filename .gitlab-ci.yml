@@ -52,4 +52,5 @@ sign-image-notation:
 
   script:
     - notation ls $IMAGE_URI
-    - notation sign $IMAGE_URI --key $COSIGN_PRIVATE_KEY
+    - notation cert generate-test --default "test-key"
+    - notation sign $IMAGE_URI --key "test-key"
