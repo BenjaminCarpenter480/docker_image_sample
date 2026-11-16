@@ -9,9 +9,11 @@ on:
 jobs:
 
   build:
-
-    runs-on: self-hosted
-
+    runs-on: self-hosted 
+    container:
+      image: moby/buildkit:rootless
+      env:
+        BUILDKITD_FLAGS: --oci-worker-no-process-sandbox
     steps:
     - uses: actions/checkout@v4
     - name: Setup Docker
