@@ -1,0 +1,27 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    runs-on: moby/buildkit:rootless
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup Docker
+      run: |
+            mkdir -p ~/.docker
+            echo "{\"auths\":{\"$HARBOR_HOST\":{\"username\":\"$HARBOR_USERNAME\" ,\"password\":\"$HARBOR_PASSWORD\"}}}" > ~/.docker/config.json
+    - name: Build the Docker image
+      run: |
+        buildctl-daemonless.sh build \
+          --frontend dockerfile.v0 \
+          --local context=. \
+          --local dockerfile=. \
+          --output type=image,name=$HARBOR_HOST/$HARBOR_PROJECT/hello-world:latest,push=true
