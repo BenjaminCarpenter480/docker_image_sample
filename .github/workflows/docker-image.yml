@@ -45,12 +45,12 @@ jobs:
           password: ${{ secrets.HARBOR_PASSWORD }}
 
       - name: Build and push the Docker image
+        id: build-image
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
           tags: ${{ env.HARBOR_HOST }}/${{ env.HARBOR_PROJECT }}/hello-world:latest
-          metadata: $GITHUB_WORKSPACE/buildkit-metadata.json
 
       - name: Install Cosign
         uses: sigstore/cosign-installer@v4.0.0
@@ -58,7 +58,7 @@ jobs:
       - name: Get Image digest
         id: get-digest
         run: |
-          IMAGE_DIGEST=$IMAGE_NAME@$(tr -d '\n' <$GITHUB_WORKSPACE/buildkit-metadata.json | grep -o '"containerimage.digest":[^"]*"[^"]*"' | sed -E 's/".*".*"(.*)"/\1/')
+          IMAGE_DIGEST=$IMAGE_NAME@$(tr -d '\n' < ${{ steps.build-image.outputs.metadata }} | grep -o '"containerimage.digest":[^"]*"[^"]*"' | sed -E 's/".*".*"(.*)"/\1/')
           echo "Image Digest: $IMAGE_DIGEST"
           echo "IMAGE_DIGEST=$IMAGE_DIGEST" >> $GITHUB_OUTPUT
 
