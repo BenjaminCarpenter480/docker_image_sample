@@ -1,11 +1,21 @@
+stages:
+  - build
+  - sign
+
+variables:
+  IMAGE_TAG: $CI_COMMIT_SHA
+  IMAGE_NAME: $HARBOR_HOST/$HARBOR_PROJECT/hello-world
+  IMAGE_URI: "$IMAGE_NAME:$IMAGE_TAG"
+
 build-rootless:
   image:
     name: moby/buildkit:rootless
   stage: build
   variables:
     BUILDKITD_FLAGS: --oci-worker-no-process-sandbox
-    REG_IMAGE: "$HARBOR_HOST/$HARBOR_PROJECT/hello-world:$CI_COMMIT_SHA"
   before_script:
+    # Login to Harbor registry using provided credentials to allow pushing the built image
+    # TODO: Turn this into a anchor possibly
     - mkdir -p ~/.docker
     - echo "{\"auths\":{\"$HARBOR_HOST\":{\"username\":\"$HARBOR_USERNAME\" ,\"password\":\"$HARBOR_PASSWORD\"}}}" > ~/.docker/config.json
   script:
@@ -14,5 +24,50 @@ build-rootless:
         --frontend dockerfile.v0 \
         --local context=. \
         --local dockerfile=. \
-        --output type=image,name=$HARBOR_HOST/$HARBOR_PROJECT/hello-world:latest,push=true
-        # --output type=image,\"name=$REG_IMAGE,$HARBOR_HOST/$HARBOR_PROJECT/hello-world:latest\",push=true
+        --output type=image,name=$HARBOR_HOST/$HARBOR_PROJECT/hello-world:latest,push=true \
+        --metadata-file=$CI_PROJECT_DIR/buildkit-metadata.json
+
+  artifacts:
+    paths:
+      - $CI_PROJECT_DIR/buildkit-metadata.json
+    expire_in: 1 week
+
+sign-image:
+  stage: sign
+  dependencies:
+    - build-rootless
+  image:
+    name: bitnami/cosign:latest
+
+  variables:
+    COSIGN_YES: "true" # Automatically confirm actions in Cosign without user interaction
+    FF_SCRIPT_SECTIONS: "true" # Enables GitLab's CI script sections for better multi-line script output
+
+  before_script:
+    - IMAGE_DIGEST=$IMAGE_NAME@$(tr -d '\n' <$CI_PROJECT_DIR/buildkit-metadata.json | grep -o '"containerimage.digest":[^"]*"[^"]*"' | sed -E 's/".*".*"(.*)"/\1/') # Extract the digest value from the JSON metadata
+    # Login to Harbor registry using provided credentials to allow pushing the built image
+    - mkdir -p ~/.docker
+    - echo "{\"auths\":{\"$HARBOR_HOST\":{\"username\":\"$HARBOR_USERNAME\" ,\"password\":\"$HARBOR_PASSWORD\"}}}" > ~/.docker/config.json
+
+  script:
+    # Sign the image using Cosign with annotations that provide metadata about the build and tag annotation to allow verifying
+    # the tag->digest mapping (https://github.com/sigstore/cosign?tab=readme-ov-file#tag-signing)
+    - |
+      cosign -d sign --key $COSIGN_PRIVATE_KEY "$IMAGE_DIGEST" \
+        --annotations "com.gitlab.ci.user.name=$GITLAB_USER_NAME" \
+        --annotations "com.gitlab.ci.pipeline.id=$CI_PIPELINE_ID" \
+        --annotations "com.gitlab.ci.pipeline.url=$CI_PIPELINE_URL" \
+        --annotations "com.gitlab.ci.job.id=$CI_JOB_ID" \
+        --annotations "com.gitlab.ci.job.url=$CI_JOB_URL" \
+        --annotations "com.gitlab.ci.commit.sha=$CI_COMMIT_SHA" \
+        --annotations "com.gitlab.ci.commit.ref.name=$CI_COMMIT_REF_NAME" \
+        --annotations "com.gitlab.ci.project.path=$CI_PROJECT_PATH" \
+        --annotations "org.opencontainers.image.source=$CI_PROJECT_URL" \
+        --annotations "org.opencontainers.image.revision=$CI_COMMIT_SHA" \
+        --annotations "tag=$IMAGE_TAG"
+
+    # Verify the image signature using Cosign to ensure it matches the expected annotations and certificate identity
+    - |
+      cosign verify --key $COSIGN_PUBLIC_KEY\
+        --annotations "tag=$IMAGE_TAG" \
+        "$IMAGE_DIGEST"

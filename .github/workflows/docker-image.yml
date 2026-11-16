@@ -2,9 +2,9 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 env:
   # Map your GitHub Repository Secrets / Variables here
@@ -15,7 +15,9 @@ env:
 jobs:
   build:
     runs-on: self-hosted
-
+    permissions:
+          contents: read
+          id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -45,11 +47,32 @@ jobs:
           password: ${{ secrets.HARBOR_PASSWORD }}
 
       - name: Build and push the Docker image
+        id: build-image
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
           tags: ${{ env.HARBOR_HOST }}/${{ env.HARBOR_PROJECT }}/hello-world:latest
+
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v4.0.0
+
+      - name: Set image digest
+        id: get-digest
+        run: |
+          echo "IMAGE_DIGEST=${{ env.HARBOR_HOST }}/${{ env.HARBOR_PROJECT }}/hello-world:latest@${{ steps.build-image.outputs.digest }}" >> "$GITHUB_OUTPUT"
+
+      - name: Sign and verify the images with GitHub OIDC Token
+        run: |
+          cosign sign --yes ${{ steps.get-digest.outputs.IMAGE_DIGEST }} \
+            --annotations "com.github.actions.workflow=${{ github.workflow }}" \
+            --annotations "com.github.actions.run_id=${{ github.run_id }}" \
+            --annotations "com.github.actions.run_number=${{ github.run_number }}" \
+            --annotations "com.github.actions.job=${{ github.job }}" \
+            --annotations "com.github.actions.actor=${{ github.actor }}" \
+            --annotations "com.github.actions.repository=${{ github.repository }}" \
+            --annotations "com.github.actions.ref=${{ github.ref }}" \
+            --annotations "com.github.actions.sha=${{ github.sha }}"
 
       - name: Stop Rootless BuildKit daemon
         if: always()
