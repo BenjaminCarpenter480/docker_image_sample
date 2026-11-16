@@ -58,8 +58,8 @@ jobs:
       - name: Set image digest
         id: get-digest
         run: |
-          echo "IMAGE_DIGEST=${IMAGE_NAME}@${{ steps.build-image.outputs.digest }}" >> "$GITHUB_OUTPUT"
-      
+          echo "IMAGE_DIGEST=${{ env.HARBOR_HOST }}/${{ env.HARBOR_PROJECT }}/hello-world:latest@${{ steps.build-image.outputs.digest }}" >> "$GITHUB_OUTPUT"
+
       - name: Sign and verify the images with GitHub OIDC Token
         run: |
           cosign sign --yes ${{ steps.get-digest.outputs.IMAGE_DIGEST }} \
