@@ -55,13 +55,11 @@ jobs:
       - name: Install Cosign
         uses: sigstore/cosign-installer@v4.0.0
 
-      - name: Get Image digest
+      - name: Set image digest
         id: get-digest
         run: |
-          IMAGE_DIGEST=$IMAGE_NAME@$(tr -d '\n' < "${{ steps.build-image.outputs.metadata }}" | grep -o '"containerimage.digest":[^"]*"[^"]*"' | sed -E 's/".*".*"(.*)"/\1/')
-          echo $IMAGE_DIGEST
-          echo "IMAGE_DIGEST=$IMAGE_DIGEST" >> $GITHUB_OUTPUT
-
+          echo "IMAGE_DIGEST=${IMAGE_NAME}@${{ steps.build-image.outputs.digest }}" >> "$GITHUB_OUTPUT"
+      
       - name: Sign and verify the images with GitHub OIDC Token
         run: |
           cosign sign --yes ${{ steps.get-digest.outputs.IMAGE_DIGEST }} \
